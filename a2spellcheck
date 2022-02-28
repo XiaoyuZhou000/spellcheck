@@ -1,0 +1,104 @@
+#!/bin/bash
+
+
+# Author: Xiaoyu Zhou
+# Date: 2022/01/26
+# UWNetID: xz081302
+# Homework 2: Part 2
+# This script will do a spell check for the input arguments.
+
+# If the script is not suppiled with an input argument, print a usage note to stderr and exit with a code of 1
+if [ $# -eq 0 ] ;
+then
+  echo "$0 invalid file" 1>&2
+  exit 1
+fi
+
+while [ $# -gt 0 ];
+do
+
+	# If an argument is supplied that is not a valid file, print an error message to stderr and exit with a code of 1
+	if [ ! -f "$1" ];
+	then
+		echo "$0 error: $1 does not exist - skipping" 1>&2
+	else
+	
+		# if <FILE>.spelling file does not exist, create a new one, else replacing.
+		if [ ! -e "$1".spelling ] ;
+		then
+  		echo "$0 creating $1.spelling file"
+		else
+  		rm "$1.spelling"
+  		echo "$0 replacing $1.spelling file"
+		fi
+		touch "$1".spelling
+		
+		# Variable to count unique words
+		unique=0 
+		
+		# Read the given file by words and compare with the dictionary
+		while read LINE;
+		do
+  		for WORD in $LINE;
+  		do
+    		if ! grep -qiw "$WORD" /usr/share/dict/words;
+    		then
+    			# Check whether the new word is unique
+    			if ! grep -qiw "$WORD" "$1".spelling;
+    			then
+    				unique=$(( $unique + 1 ))
+    			fi
+      		echo "$WORD" >> "$1".spelling
+    		fi
+  		done
+		done < "$1"
+		wordcount=$(wc -w "$1".spelling | grep -o -E '[0-9]+')
+		echo "$0 processed $1 and found $wordcount spelling errors $unique of which are unique"
+	fi
+	shift
+done
+exit 0
+
+
+
+
+
+
+
+
+
+# If an argument is supplied that is not a valid file, print an error message to stderr and exit with a code of 1
+
+#if [ ! -f $1 ];
+#then
+#  echo "Not invaild file" 1>&2
+#  exit 1
+#fi
+
+# if <FILE>.spelling file does not exist, create a new one, else replacing.
+#if [ ! -e $1.spelling ];
+#then
+#  echo "creating '$1'.spelling file"
+#else
+#  rm $1.spelling
+#  echo "replacing '$1'.spelling file"
+#fi
+#touch $1.spelling
+
+# Read the given file by words and compare with the dictionary
+
+#while read LINE;
+#do
+#  for WORD in $LINE;
+#  do
+#    if ! grep -qiw $WORD /usr/share/dict/words;
+#    then
+#      echo "$WORD" >> $1.spelling
+#    fi
+#  done
+#done < $1
+
+#wc -w $1.spelling
+
+#exit 0
+
